@@ -1,0 +1,10 @@
+django==3.2.*
+pusher
+midtransclient
+django-admin-rangefilter
+django-object-actions
+gunicorn
+dj-database-url
+whitenoise
+psycopg2
+pymysql

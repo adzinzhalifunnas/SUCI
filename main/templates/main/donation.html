@@ -1,0 +1,70 @@
+{% extends "main/layouts/base.html" %}
+
+{% block title %}
+<title>Live Notification Donation</title>
+{% endblock %}
+
+{% block style %}
+<style>
+    body {
+        background-color: rgba(0, 0, 0, 0) !important;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div id="notif">
+
+</div>
+{% endblock %}
+
+{% block script %}
+{% load static %}
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+<script>
+    function escapeHtml(html){
+        const text = document.createTextNode(html);
+        const p = document.createElement('p');
+        p.appendChild(text);
+        return p.innerHTML;
+    }
+
+    function convertToRupiah(angka){
+        let rupiah = '';		
+        let angkarev = angka.toString().split('').reverse().join('');
+        for(let i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
+        return 'Rp. '+rupiah.split('',rupiah.length-1).reverse().join('');
+    }
+
+    $(document).ready(() => {
+        const audio = new Audio('{% static "audio/money.mp3" %}');
+        const donations = [];
+        const notif = $('#notif');
+        const pusher = new Pusher('{{PUSHER_KEY}}', {
+            cluster: '{{PUSHER_CLUSTER}}'
+        });
+        const channel = pusher.subscribe('{{CHANNEL_PUSHER_NAME}}');
+        channel.bind('donation', (data) => {
+            donations.push(data);
+        })
+
+        setInterval(() => {
+            if (donations.length != 0) {
+                const donation = donations.shift();
+                notif.html(`
+                <div class="px-1 py-1 rounded text-7xl text-white px-3 py-3 bg-red-600">
+                    <center>
+                        <span>${escapeHtml(donation.name)} memberi ${convertToRupiah(donation.amount)}</span><br>
+                        <span>${escapeHtml(donation.message)}</span>
+                    </center>
+                </div>
+                `);
+                audio.play();
+            } else {
+                notif.html('');
+            }
+        }, 8000);
+    });
+</script>
+{% endblock %}

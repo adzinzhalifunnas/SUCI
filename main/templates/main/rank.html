@@ -1,0 +1,90 @@
+{% extends "main/layouts/base.html" %}
+
+{% block title %}
+<title>Live Rank Donation</title>
+{% endblock %}
+
+{% block style %}
+<style>
+  body {
+    background-color: rgba(0, 0, 0, 0) !important;
+  }
+</style>
+{% endblock%}
+
+
+{% block content %}
+<div class="bg-red-600 px-5 py-5 rounded text-white">
+    <p class="text-3xl md:text-6xl text-center">{{RANK_TEXT}}</p>
+    <div class="justify-items-center text-1xl md:text-4xl mt-4">
+        <span>1.</span>
+        <span>Salis Mazaya</span>
+        <span>Rp. 1.000.000</span>
+    </div>
+    <div class="justify-items-center text-1xl md:text-4xl mt-4">
+        <span>2.</span>
+        <span>Salis Mazaya</span>
+        <span>Rp. 1.000.000</span>
+    </div>
+    <div class="justify-items-center text-1xl md:text-4xl mt-4">
+        <span>3.</span>
+        <span>Salis Mazaya</span>
+        <span>Rp. 1.000.000</span>
+    </div>
+    <div class="justify-items-center text-1xl md:text-4xl mt-4">
+        <span>4.</span>
+        <span>Salis Mazaya</span>
+        <span>Rp. 1.000.000</span>
+    </div>
+    <div class="justify-items-center text-1xl md:text-4xl mt-4">
+        <span>5.</span>
+        <span>Salis Mazaya</span>
+        <span>Rp. 1.000.000</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+  function convertToRupiah(angka){
+    let rupiah = '';		
+    let angkarev = angka.toString().split('').reverse().join('');
+    for(let i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
+    return 'Rp. '+rupiah.split('',rupiah.length-1).reverse().join('');
+  }
+
+  $(document).ready(() => {
+    $.ajax({
+      url: '{% url "rank-donation" %}',
+      type: 'GET',
+      success: (data) => {
+        data = JSON.parse(data);
+        for (let i = 0; i < data.length; i++) {
+          const name = $(`#name${i + 1}`);
+          const total = $(`#total${i + 1}`);
+          const keren = data[i];
+          name.html(keren[0]);
+          total.html(convertToRupiah(keren[1]));
+        }
+      },
+    });
+
+    setInterval(() => {
+      $.ajax({
+        url: '{% url "rank-donation" %}',
+        type: 'GET',
+        success: (data) => {
+          data = JSON.parse(data);
+          for (let i = 0; i < data.length; i++) {
+            const name = $(`#name${i + 1}`);
+            const total = $(`#total${i + 1}`);
+            const keren = data[i];
+            name.html(keren[0]);
+            total.html(convertToRupiah(keren[1]));
+          }
+        },
+      });
+    }, 60000);
+  });
+</script>
+{% endblock script%}

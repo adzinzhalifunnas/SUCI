@@ -1,0 +1,26 @@
+{
+  "name": "suci",
+  "version": "0.0.1",
+  "description": "Software Untuk Charity Indonesia",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tailwindcss -i ./style.css -o ./static/css/tailwind.css",
+    "dev": "python manage.py runserver"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salismazaya/SUCI.git"
+  },
+  "author": "Salis Mazaya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/salismazaya/SUCI/issues"
+  },
+  "homepage": "https://github.com/salismazaya/SUCI#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.3.11",
+    "tailwindcss": "^2.2.19"
+  }
+}
