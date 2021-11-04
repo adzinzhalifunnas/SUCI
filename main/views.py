@@ -5,12 +5,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from suci.settings import CHANNEL_PUSHER_NAME, SECRET_KEY
+from suci.settings import CHANNEL_PUSHER_NAME, SECRET_KEY, PAYMENT_GATEWAY, TRIPAY_PRIVATE_KEY
 from main.pusher import pusher_client
-from main.midtrans import core_api, snap
 from main.models import Donation, Text
 from main.forms import DonationForm
-import json, re
+from main.tripay import generatePayment
+import json, re, hmac, hashlib
 
 @require_http_methods(['GET', 'POST'])
 def index(request: WSGIRequest):
@@ -33,10 +33,10 @@ def index(request: WSGIRequest):
 
 
     if request.method == 'GET':
-        if request.GET.get('transaction_status') == 'pending':
+        if request.GET.get('transaction_status') == 'pending' or request.GET.get('tripay_status') == 'UNPAID':
             context['info_msg'] = 'Pembayaran kamu belum selesai'
 
-        elif request.GET.get('transaction_status') == 'settlement':
+        elif request.GET.get('transaction_status') == 'settlement' or request.GET.get('tripay_status') == 'PAID':
             context['success_msg'] = 'Pembayaran telah berhasil!'
 
         return render(request, 'main/index.html', context)
@@ -54,29 +54,20 @@ def index(request: WSGIRequest):
             return render(request, 'main/index.html', context)
 
         uniq_name = get_random_string()
+        context['channel'] = uniq_name
 
         donation = Donation(
             name = form.cleaned_data['name'],
             uniq_name = uniq_name,
             message = form.cleaned_data['message'],
+            email = form.cleaned_data['email'],
             amount = total,
         )
         donation.save()
 
-        param = {
-            'payment_type': 'qris',
-            'transaction_details': {
-                'gross_amount': total,
-                'order_id': donation.id,
-            },
-        }
-
-        transaction = core_api.charge(param)
-        
-        context['channel'] = uniq_name
-        context['qr_image'] = transaction['actions'][0]['url']
-        return render(request, 'main/payment.html', context)
-
+        if PAYMENT_GATEWAY == 'tripay':
+            url = generatePayment(request, donation)['data']['checkout_url']
+            return redirect(url)
 
 
 def notification(request: WSGIRequest):
@@ -89,8 +80,16 @@ def notification(request: WSGIRequest):
 def rank(request: WSGIRequest):
     if request.GET.get('secret_key') != SECRET_KEY:
         return HttpResponseForbidden('Forbidden')
+
+    rank_title = 'Para Sultan'
+    data = Text.objects.filter(name = 'RANK_TITLE')
+    if data:
+        rank_title = data.text
     
-    return render(request, 'main/rank.html')
+    context = {
+        'rank_title': rank_title,
+    }
+    return render(request, 'main/rank.html', context)
 
 
 def milestone(request: WSGIRequest):
@@ -117,24 +116,25 @@ def faq(request: WSGIRequest):
 @csrf_exempt
 @require_POST
 def webhook(request: WSGIRequest):
-    data = json.loads(request.body.decode())
-    response = core_api.transactions.notification(data)
-    donation = Donation.objects.filter(id = response['order_id']).first()
-    if not donation:
-        return HttpResponseNotFound('Not Found')
-    
-    if response['transaction_status'] == 'settlement':
+    if PAYMENT_GATEWAY == 'tripay':
+        calcSignature = request.headers.get('X-Callback-Signature', '')
+        signature = hmac.new(bytes(TRIPAY_PRIVATE_KEY, 'latin-1'), bytes(request.body.decode(), 'latin-1'), hashlib.sha256).hexdigest()
+        data = json.loads(request.body.decode())
+
+        if calcSignature != signature:
+            return HttpResponseForbidden('Bad Signature')
+
+        if data['status'] != 'PAID':
+            return HttpResponse(json.dumps({'status':'ok'}))
+
+        donation: Donation = Donation.objects.get(id = data['merchant_ref'])
         donation.already_received = True
         donation.save()
+
         pusher_client.trigger(CHANNEL_PUSHER_NAME, 'donation', {
             'name': donation.name,
             'amount': donation.amount,
             'message': donation.message,
         })
-        pusher_client.trigger(donation.uniq_name, 'payment_success', {
-            'url': request.scheme + '://' + request.get_host() + reverse('index') + '?transaction_status=settlement'
-        })
-        return HttpResponse('OK')
 
-    else:
-        return HttpResponse('OK')
+        return HttpResponse(json.dumps({'status':'ok'}))

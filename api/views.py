@@ -5,7 +5,7 @@ import json
 
 def rank_donation(request: WSGIRequest):
     rank_by_donation = {}
-    donations = Donation.objects.filter(active = True).filter(already_received = True).all()[:5]
+    donations = Donation.objects.filter(active = True).filter(already_received = True).all()
     for donation in donations:
         if rank_by_donation.get(donation.name):
             rank_by_donation[donation.name] += donation.amount
@@ -18,7 +18,7 @@ def rank_donation(request: WSGIRequest):
     for i in range(len(rank_by_donation)):
         rank_by_donation[i] = list(rank_by_donation[i])
     
-    return HttpResponse(json.dumps(rank_by_donation))
+    return HttpResponse(json.dumps(rank_by_donation[:5]))
 
 def milestone(request: WSGIRequest):
     total = 0

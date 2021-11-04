@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from django.utils.crypto import get_random_string
 from pathlib import Path
 import os
 import dj_database_url
@@ -143,12 +144,18 @@ STATICFILES_STORAGE =  'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CHANNEL_PUSHER_NAME = 'suci'
+CHANNEL_PUSHER_NAME = 'suci_' + get_random_string()
 PUSHER_APP_ID = os.environ.get('PUSHER_APP_ID')
 PUSHER_KEY = os.environ.get('PUSHER_KEY')
 PUSHER_SECRET = os.environ.get('PUSHER_SECRET')
 PUSHER_CLUSTER = os.environ.get('PUSHER_CLUSTER')
 
-MIDTRANS_SERVER_KEY = os.environ.get('MIDTRANS_SERVER_KEY')
-MIDTRANS_CLIENT_KEY = os.environ.get('MIDTRANS_CLIENT_KEY')
 SANDBOX = os.environ.get('SANDBOX', 'True') == 'True'
+
+PAYMENT_GATEWAY = os.environ['PAYMENT_GATEWAY']
+if not PAYMENT_GATEWAY in ['tripay']:
+    raise Exception('payment gateway not supported')
+
+TRIPAY_MERCHANT_CODE = os.environ.get('TRIPAY_MERCHANT_CODE')
+TRIPAY_API_KEY = os.environ.get('TRIPAY_API_KEY')
+TRIPAY_PRIVATE_KEY = os.environ.get('TRIPAY_PRIVATE_KEY')
