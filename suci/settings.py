@@ -73,7 +73,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'main.context_processors.pusher',
-                'main.context_processors.rank_text',
+                'main.context_processors.bank',
             ],
         },
     },
@@ -153,9 +153,13 @@ PUSHER_CLUSTER = os.environ.get('PUSHER_CLUSTER')
 SANDBOX = os.environ.get('SANDBOX', 'True') == 'True'
 
 PAYMENT_GATEWAY = os.environ['PAYMENT_GATEWAY']
-if not PAYMENT_GATEWAY in ['tripay']:
+if not PAYMENT_GATEWAY in ['tripay', 'cekmutasi']:
     raise Exception('payment gateway not supported')
 
 TRIPAY_MERCHANT_CODE = os.environ.get('TRIPAY_MERCHANT_CODE')
 TRIPAY_API_KEY = os.environ.get('TRIPAY_API_KEY')
 TRIPAY_PRIVATE_KEY = os.environ.get('TRIPAY_PRIVATE_KEY')
+
+CEKMUTASI_API_SIGNATURE = os.environ.get('CEKMUTASI_API_SIGNATURE')
+NOREK = os.environ.get('NOREK')
+OWNERNAME = os.environ.get('OWNERNAME')

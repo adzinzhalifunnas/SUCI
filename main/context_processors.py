@@ -1,6 +1,6 @@
 from django.core.handlers.wsgi import WSGIRequest
 from main.models import Text
-from suci.settings import PUSHER_APP_ID, PUSHER_CLUSTER, PUSHER_KEY, PUSHER_SECRET, CHANNEL_PUSHER_NAME
+from suci.settings import PUSHER_APP_ID, PUSHER_CLUSTER, PUSHER_KEY, PUSHER_SECRET, CHANNEL_PUSHER_NAME, NOREK, OWNERNAME
 
 def pusher(request: WSGIRequest):
     return {
@@ -12,12 +12,8 @@ def pusher(request: WSGIRequest):
     }
 
 
-def rank_text(request: WSGIRequest):
-    RANK_TEXT = 'Para Sultan'
-    data = Text.objects.filter(name = 'RANK_TEXT').first()
-    if data:
-        RANK_TEXT = data.text
-    
+def bank(request: WSGIRequest):
     return {
-        'RANK_TEXT': RANK_TEXT
+        'NOREK': NOREK,
+        'OWNERNAME': OWNERNAME,
     }

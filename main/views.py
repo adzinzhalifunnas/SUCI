@@ -1,16 +1,19 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponseBadRequest
 from django.core.handlers.wsgi import WSGIRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.crypto import get_random_string
-from suci.settings import CHANNEL_PUSHER_NAME, SECRET_KEY, PAYMENT_GATEWAY, TRIPAY_PRIVATE_KEY
+from suci.settings import CHANNEL_PUSHER_NAME, SECRET_KEY, PAYMENT_GATEWAY, TRIPAY_PRIVATE_KEY, CEKMUTASI_API_SIGNATURE
 from main.pusher import pusher_client
-from main.models import Donation, Text
+from main.models import Donation, Text, Payment
 from main.forms import DonationForm
 from main.tripay import generatePayment
-import json, re, hmac, hashlib
+from main.utils import to_rupiah
+from datetime import datetime, timedelta
+import json, re, hmac, hashlib, time, random
 
 @require_http_methods(['GET', 'POST'])
 def index(request: WSGIRequest):
@@ -31,6 +34,8 @@ def index(request: WSGIRequest):
         'description': description
     }
 
+    if PAYMENT_GATEWAY == 'cekmutasi' and int(datetime.utcfromtimestamp(time.time()).strftime('%H')) in [15, 16, 17, 18, 19]:
+        context['info_msg'] = 'Pembayaran sedang offline!'
 
     if request.method == 'GET':
         if request.GET.get('transaction_status') == 'pending' or request.GET.get('tripay_status') == 'UNPAID':
@@ -56,6 +61,9 @@ def index(request: WSGIRequest):
         uniq_name = get_random_string()
         context['channel'] = uniq_name
 
+        if PAYMENT_GATEWAY == 'cekmutasi':
+            total += random.randint(0, 999)
+
         donation = Donation(
             name = form.cleaned_data['name'],
             uniq_name = uniq_name,
@@ -68,6 +76,16 @@ def index(request: WSGIRequest):
         if PAYMENT_GATEWAY == 'tripay':
             url = generatePayment(request, donation)['data']['checkout_url']
             return redirect(url)
+        
+        elif PAYMENT_GATEWAY == 'cekmutasi':
+            payment = Payment(
+                donation = donation,
+                expired = timezone.now() + timedelta(hours = 3)
+            )
+            payment.save()
+            context['amount'] = to_rupiah(total)
+            return render(request, 'main/payment_cekmutasi.html', context)
+
 
 
 def notification(request: WSGIRequest):
@@ -138,3 +156,40 @@ def webhook(request: WSGIRequest):
         })
 
         return HttpResponse(json.dumps({'status':'ok'}))
+    
+    elif PAYMENT_GATEWAY == 'cekmutasi':
+        callbackSignature = request.headers.get('Api-Signature')
+        if not hmac.compare_digest(callbackSignature, CEKMUTASI_API_SIGNATURE):
+            return HttpResponseBadRequest('Bad Siganature')
+        
+        data = json.loads(request.body.decode())
+        if data['action'] != 'payment_report':
+            return HttpResponse(json.dumps({'status':'ok'}))
+        
+        for payment in data['content']['data']:
+            amount = int(payment['amount'].split('.')[0])
+            payment_obj: Payment = Payment.objects.filter(donation__amount = amount).filter(done = False).filter(expired__gt = timezone.now()).first()
+            if not payment_obj:
+                continue
+
+            payment_obj.done = True
+            payment_obj.save()
+
+            payment_obj.donation.already_received = True
+            payment_obj.donation.save()
+
+            donation: Donation = payment_obj.donation
+            pusher_client.trigger(CHANNEL_PUSHER_NAME, 'donation', {
+                'name': donation.name,
+                'amount': donation.amount,
+                'message': donation.message,
+            })
+
+            pusher_client.trigger(donation.uniq_name, 'payment_success', {
+                'url': request.scheme + '://' + request.get_host() + reverse('index') + '?transaction_status=settlement'
+            })
+        
+        return HttpResponse(json.dumps({'status':'ok'}))
+
+    
+
