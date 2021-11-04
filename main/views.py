@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.core.handlers.wsgi import WSGIRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
@@ -116,7 +116,7 @@ def milestone(request: WSGIRequest):
     
     milestone_title = 'Untuk ke jalan yang benar'
 
-    data = Text.objects.filter(name = 'MILESTONE_TEXT').first()
+    data = Text.objects.filter(name = 'MILESTONE_TITLE').first()
     if data:
         milestone_title = data.text
 
