@@ -144,7 +144,7 @@ STATICFILES_STORAGE =  'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CHANNEL_PUSHER_NAME = 'suci_' + get_random_string()
+CHANNEL_PUSHER_NAME = 'suci'
 PUSHER_APP_ID = os.environ.get('PUSHER_APP_ID')
 PUSHER_KEY = os.environ.get('PUSHER_KEY')
 PUSHER_SECRET = os.environ.get('PUSHER_SECRET')
