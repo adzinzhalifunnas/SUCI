@@ -8,6 +8,7 @@
 ## Table of Contents
 - [Apa Itu SUCI?](#apa-itu-suci)
 - [Kenapa Harus Menggunakan SUCI?](#kenapa-harus-menggunakan-suci)
+- [Ingin Menginstall SUCI?](#ingin-menginstall-suci)
 
 ## Apa Itu SUCI?
 SUCI adalah project open source yang bisa kamu cek disini.
@@ -17,3 +18,6 @@ Tidak hanya untuk charity kamu juga bisa menggunakan SUCI untuk keuntungan priba
 ## Kenapa Harus Menggunakan SUCI?
 SUCI dibuat bukan untuk keuntungan author. Jadi author membuatnya sebisa mungkin "tanpa pajak".
 Dengan menggunakan SUCI dana yang dikirim donatur akan langsung masuk ke payment gateway/rekening kamu tanpa campur tangan author ^_^.
+
+## Ingin Menginstall SUCI?
+Jika manteman tertarik menginstall SUCI bisa hubungi saya di https://t.me/salismiftah gratis!
