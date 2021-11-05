@@ -13,7 +13,8 @@ from main.forms import DonationForm
 from main.tripay import generatePayment
 from main.utils import to_rupiah
 from datetime import datetime, timedelta
-import json, re, hmac, hashlib, time, random
+from io import BytesIO
+import json, re, hmac, hashlib, time, random, qrcode, base64
 
 @require_http_methods(['GET', 'POST'])
 def index(request: WSGIRequest):
@@ -88,17 +89,11 @@ def index(request: WSGIRequest):
 
 
 
-def notification(request: WSGIRequest):
-    if request.GET.get('secret_key') != SECRET_KEY:
-        return HttpResponseForbidden('Forbidden')
-    
+def notification(request: WSGIRequest):    
     return render(request, 'main/donation.html')
 
 
 def rank(request: WSGIRequest):
-    if request.GET.get('secret_key') != SECRET_KEY:
-        return HttpResponseForbidden('Forbidden')
-
     rank_title = 'Para Sultan'
     data = Text.objects.filter(name = 'RANK_TITLE')
     if data:
@@ -110,10 +105,7 @@ def rank(request: WSGIRequest):
     return render(request, 'main/rank.html', context)
 
 
-def milestone(request: WSGIRequest):
-    if request.GET.get('secret_key') != SECRET_KEY:
-        return HttpResponseForbidden('Forbidden')
-    
+def milestone(request: WSGIRequest):    
     milestone_title = 'Untuk ke jalan yang benar'
 
     data = Text.objects.filter(name = 'MILESTONE_TITLE').first()
@@ -126,6 +118,26 @@ def milestone(request: WSGIRequest):
 
     return render(request, 'main/milestone.html', context)
 
+
+def qrcode_(request: WSGIRequest):
+    url = request.scheme + '://' + request.get_host()
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=2,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+
+    img_bytes = BytesIO()
+    img = qr.make_image()
+    img.save(img_bytes, format = 'JPEG')
+    img_base64 = base64.b64encode(img_bytes.getvalue()).decode()
+    context = {
+        'qr_image': 'data:image/jpg;base64,' + img_base64
+    }
+    return render(request, 'main/qrcode.html', context)
 
 def faq(request: WSGIRequest):
     return render(request, 'main/faq.html')
