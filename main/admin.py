@@ -63,6 +63,7 @@ class DonationAdmin(DjangoObjectActions, admin.ModelAdmin):
     ]
     list_filter = [
         ('time', DateRangeFilter),
+        'time',
         'already_received',
         'active',
     ]

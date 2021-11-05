@@ -143,6 +143,10 @@ def faq(request: WSGIRequest):
     return render(request, 'main/faq.html')
 
 
+def handler404(request: WSGIRequest, exception):
+    return render(request, 'main/404.html')
+
+
 @csrf_exempt
 @require_POST
 def webhook(request: WSGIRequest):

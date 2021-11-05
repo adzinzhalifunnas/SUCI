@@ -2,7 +2,6 @@
   "name": "suci",
   "version": "0.0.1",
   "description": "Software Untuk Charity Indonesia",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tailwindcss -i ./style.css -o ./static/css/tailwind.css",
