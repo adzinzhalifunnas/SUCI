@@ -15,6 +15,7 @@
 	- [Mensetting Environment Variabel](#mensetting-environment-variabel)
 	- [Menjalankan Suci](#menjalankan-suci)
 	- [Membuat User Untuk Login Admin](#membuat-user-untuk-login-admin)
+	- [Memakai SUCI](#memakai-suci)
 
 ## Apa Itu SUCI?
 SUCI adalah project open source yang bisa kamu cek disini.
@@ -94,3 +95,10 @@ gunicorn suci.wsgi
 python manage.py createsuperuser
 ```
 login di https://domainkamu.com/admin
+
+### Memakai SUCI
+Setelah suci berjalan tambahkan url berikut ke obs dengan sumber browser.
+- https://domainkamu.com/donation/notif (untuk melihat realtime orang yang berdonasi)
+- https://domainkamu.com/donation/rank (untuk melihat peringkat donasi)
+- https://domainkamu.com/donation/milestone (untuk melihat total donasi)
+-  https://domainkamu.com/donation/qrcode (untuk mendapatkan qrcode)
