@@ -12,7 +12,9 @@
 - [Meginstall Dan Menjalankan SUCI](#menginstall-dan-menjalankan-suci)
 	- [Requirements](#requirements)
 	- [Memilih Payment Gateway](#memilih-payment-gateway)
-	- [Mensetting Enviroment Variabel](#mensetting-environment-variabel)
+	- [Mensetting Environment Variabel](#mensetting-environment-variabel)
+	- [Menjalankan Suci](#menjalankan-suci)
+	- [Membuat User Untuk Login Admin](#membuat-user-untuk-login-admin)
 
 ## Apa Itu SUCI?
 SUCI adalah project open source yang bisa kamu cek disini.
@@ -49,15 +51,46 @@ daftar di https://cekmutasi.co.id
 	- Tidak support QRIS
 	- Bayar harian
 	- Memerlukan username dan password ibanking
-### Mensetting Enviroment Variabel
-#### DEBUG
-set 'True' jika development 'False' jika production
-#### ALLOWED_HOSTS
+### Mensetting Environment Variabel
+#####	DEBUG
+isi'True' jika development 'False' jika production
+##### ALLOWED_HOSTS
 diisi dengan domain website kamu, contoh: '127.0.0.1,salism3.herokuapp.com'
-#### SECRET_KEY
+##### SECRET_KEY
 diisi dengan password rahasia kamu
-#### PUSHER_APP_ID
+##### DATABASE_URL
+isi dengan database url, contoh: 'postgres://USER:PASSWORD@HOST:PORT/NAME'
+##### PUSHER_APP_ID
 #### PUSHER_KEY
-#### PUSHER_SECRET
-#### PUSHER_CLUSTER
+##### PUSHER_SECRET
+##### PUSHER_CLUSTER
 didapatkan di https://pusher.com
+##### PAYMENT_GATEWAY
+isi 'tripay' atau 'cekmutasi' sesuai pilihan kamu.
+##### SANDBOX
+isi 'True' jika sedang menggunakan sandbox payment gateway, 'False' jika sebaliknya
+##### TRIPAY_MERCHANT_CODE
+##### TRIPAY_API_KEY
+##### TRIPAY_PRIVATE_KEY
+skip langkah ini jika tidak menggunakan tripay. didapat dari https://tripay.co.id
+##### CEKMUTASI_API_SIGNATURE
+skip langkah ini jika tidak menggunakan cekmutasi, didapat dari https://cekmutasi.co.id
+##### NOREK
+skip langkah ini jika tidak menggunakan cekmutasi, isi dengan nomor rekening yang kamu daftarkan di cekmutasi
+##### OWNERNAME
+skip langkah ini jika tidak menggunakan cekmutasi, isi dengan nama pemilik rekening
+
+### Menjalankan SUCI
+- development
+ ```
+ python manage.py runserver
+```
+- production
+```
+gunicorn suci.wsgi
+```
+### Membuat User Untuk Login Admin
+```
+python manage.py createsuperuser
+```
+login di https://domainkamu.com/admin
