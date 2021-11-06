@@ -16,6 +16,7 @@
 	- [Menjalankan Suci](#menjalankan-suci)
 	- [Membuat User Untuk Login Admin](#membuat-user-untuk-login-admin)
 	- [Memakai SUCI](#memakai-suci)
+- [Mengubah Text Di SUCI](#mengubah-text-di-suci)
 
 ## Apa Itu SUCI?
 SUCI adalah project open source yang bisa kamu cek disini.
@@ -102,3 +103,8 @@ Setelah suci berjalan tambahkan url berikut ke obs dengan sumber browser.
 - https://domainkamu.com/donation/rank (untuk melihat peringkat donasi)
 - https://domainkamu.com/donation/milestone (untuk melihat total donasi)
 -  https://domainkamu.com/donation/qrcode (untuk mendapatkan qrcode)
+
+
+## Mengubah Text Di Suci
+Login ke admin dashboard di https://domainkamu.com/admin<br>
+<img src="https://user-images.githubusercontent.com/50546233/140598278-ee5d6d14-759d-4615-a56d-78ec67d3aac0.png" width=500/><br>
