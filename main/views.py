@@ -95,7 +95,7 @@ def notification(request: WSGIRequest):
 
 def rank(request: WSGIRequest):
     rank_title = 'Para Sultan'
-    data = Text.objects.filter(name = 'RANK_TITLE')
+    data = Text.objects.filter(name = 'RANK_TITLE').first()
     if data:
         rank_title = data.text
     
