@@ -13,6 +13,7 @@
 	- [Requirements](#requirements)
 	- [Memilih Payment Gateway](#memilih-payment-gateway)
 	- [Mensetting Environment Variabel](#mensetting-environment-variabel)
+	- [Migrate](#migrate)
 	- [Menjalankan Suci](#menjalankan-suci)
 	- [Membuat User Untuk Login Admin](#membuat-user-untuk-login-admin)
 	- [Memakai SUCI](#memakai-suci)
@@ -81,6 +82,11 @@ skip langkah ini jika tidak menggunakan cekmutasi, didapat dari https://cekmutas
 skip langkah ini jika tidak menggunakan cekmutasi, isi dengan nomor rekening yang kamu daftarkan di cekmutasi
 ##### OWNERNAME
 skip langkah ini jika tidak menggunakan cekmutasi, isi dengan nama pemilik rekening
+
+### Migrate
+```
+python manage.py migrate
+```
 
 ### Menjalankan SUCI
 - development
